@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f1419">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MineEcon Pro — Keekonomian Tambang</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"MineEcon Pro","short_name":"MineEcon","start_url":"./","display":"standalone","background_color":"%230f1419","theme_color":"%23f5a623","description":"Kalkulator Keekonomian Pertambangan","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect fill=%27%230f1419%27 width=%27512%27 height=%27512%27/%3E%3Ctext x=%27256%27 y=%27330%27 font-size=%27220%27 text-anchor=%27middle%27 fill=%27%23f5a623%27 font-family=%27Arial%27 font-weight=%27bold%27%3EME%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+<style>
+:root{--bg:#0f1419;--panel:#161d26;--panel2:#1e2836;--panel3:#28364a;--border:#2f3d4f;--text:#e8eef5;--muted:#8fa3b8;--accent:#f5a623;--accent2:#4a9eff;--green:#2ecc71;--red:#e74c3c;--yellow:#f1c40f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:14px}
+header{background:linear-gradient(135deg,#1a2432,#0f1419);padding:16px 20px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-size:20px;color:var(--accent);letter-spacing:0.5px}
+header h1 span{color:var(--accent2)}
+header .sub{color:var(--muted);font-size:11px}
+header .actions-header{display:flex;gap:8px}
+header .actions-header button{background:var(--panel3);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600}
+header .actions-header button:hover{background:var(--border)}
+nav.tabs{display:flex;overflow-x:auto;background:var(--panel);border-bottom:1px solid var(--border);padding:0 8px;position:sticky;top:0;z-index:100;scrollbar-width:thin}
+nav.tabs button{background:transparent;border:none;color:var(--muted);padding:12px 14px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s}
+nav.tabs button:hover{color:var(--text)}
+nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+main{padding:18px;max-width:1500px;margin:0 auto}
+.tab-content{display:none;animation:fade .25s}
+.tab-content.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h2{font-size:17px;color:var(--accent);margin-bottom:6px}
+h3{font-size:11px;color:var(--accent2);margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.8px}
+.reg-note{background:var(--panel2);border-left:3px solid var(--accent2);padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:12px;color:var(--muted)}
+.reg-note b{color:var(--accent2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.field{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:13px;font-family:inherit}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;font-weight:600}
+.kpi .val{font-size:18px;font-weight:700;color:var(--text)}
+.kpi .val.pos{color:var(--green)}
+.kpi .val.neg{color:var(--red)}
+.kpi .val.warn{color:var(--yellow)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+table th{background:var(--panel3);color:var(--accent2);padding:8px 8px;text-align:right;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+table th:first-child{text-align:left}
+table td{padding:5px 8px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;vertical-align:middle}
+table td:first-child{text-align:left;color:var(--muted)}
+table tr:hover td{background:rgba(74,158,255,0.03)}
+table tr.total-row td{background:var(--panel3);font-weight:700;color:var(--accent);border-top:2px solid var(--accent)}
+table td input,table td select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-size:12px;font-family:inherit;text-align:right}
+table td input[type=text]{text-align:left}
+table td input:focus,table td select:focus{outline:none;border-color:var(--accent);background:rgba(245,166,35,0.05)}
+table td input[type=number]{-moz-appearance:textfield}
+table td input[type=number]::-webkit-outer-spin-button,table td input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.table-scroll{max-height:600px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+.table-scroll::-webkit-scrollbar{width:8px;height:8px}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.btn{background:var(--accent);color:#111;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;letter-spacing:0.3px;transition:all .15s}
+.btn:hover{background:#ffb733;transform:translateY(-1px)}
+.btn.secondary{background:var(--panel3);color:var(--text);border:1px solid var(--border)}
+.btn.secondary:hover{background:var(--border)}
+.btn.danger{background:var(--red);color:#fff}
+.btn.danger:hover{background:#c0392b}
+.btn.small{padding:5px 10px;font-size:11px}
+.btn-add{background:rgba(46,204,113,0.15);color:var(--green);border:1px dashed var(--green);padding:7px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-add:hover{background:rgba(46,204,113,0.25)}
+.btn-del{background:transparent;color:var(--red);border:none;font-size:18px;cursor:pointer;padding:2px 8px;line-height:1}
+.btn-del:hover{color:#ff6b6b;background:rgba(231,76,60,0.1);border-radius:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px}
+.badge.good{background:rgba(46,204,113,0.15);color:var(--green)}
+.badge.bad{background:rgba(231,76,60,0.15);color:var(--red)}
+.badge.warn{background:rgba(241,196,15,0.15);color:var(--yellow)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+.summary-line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.summary-line:last-child{border-bottom:none}
+.summary-line span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px}
+.bar-row .lbl{min-width:160px;color:var(--muted)}
+.bar-row .bar{flex:1;height:16px;background:var(--bg);border-radius:4px;overflow:hidden}
+.bar-row .bar>div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .3s}
+.bar-row .val{min-width:100px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.timeline-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;padding:8px;background:var(--panel2);border-radius:6px}
+.timeline-row .phase{min-width:130px;font-weight:600;color:var(--accent)}
+.timeline-row .info{min-width:90px;color:var(--muted);font-size:11px}
+.timeline-row .gantt{flex:1;height:20px;background:var(--bg);border-radius:4px;position:relative;overflow:hidden}
+.timeline-row .gantt>div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));position:absolute;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#111;font-weight:700;white-space:nowrap;overflow:hidden}
+.timeline-row .cost{min-width:90px;text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.reg-item{background:var(--panel2);border-radius:6px;padding:10px 14px;border-left:3px solid var(--accent);margin-bottom:8px}
+.reg-item .reg-title{font-weight:700;color:var(--accent);font-size:12px;margin-bottom:3px}
+.reg-item .reg-desc{font-size:11px;color:var(--muted)}
+.save-indicator{position:fixed;bottom:16px;right:16px;background:var(--green);color:#111;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;opacity:0;transition:opacity .3s;z-index:1000;pointer-events:none}
+.save-indicator.show{opacity:1}
+footer{text-align:center;padding:16px;color:var(--muted);font-size:10px;border-top:1px solid var(--border);margin-top:24px}
+.disclaimer{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);padding:10px 12px;border-radius:6px;font-size:11px;color:#e0a0a0;margin-top:16px}
+.install-box{background:linear-gradient(135deg,rgba(245,166,35,0.1),rgba(74,158,255,0.1));border:1px solid var(--accent);border-radius:10px;padding:16px;margin-bottom:14px}
+.install-box h3{color:var(--accent);margin:0 0 8px}
+.install-box p{font-size:12px;color:var(--muted);margin-bottom:10px}
+@media print{nav.tabs,.actions,header .actions-header{display:none}body{background:#fff;color:#000}.panel{border:1px solid #ccc}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Mine<span>Econ</span> Pro</h1>
+    <div class="sub">Keekonomian Tambang — Editable &amp; Terintegrasi</div>
+  </div>
+  <div class="actions-header">
+    <button onclick="exportData()">💾 Export</button>
+    <button onclick="document.getElementById('importFile').click()">📂 Import</button>
+    <button onclick="window.print()">🖨️ Cetak</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="active" data-tab="dashboard">📊 Dashboard</button>
+  <button data-tab="prospeksi">1. Prospeksi</button>
+  <button data-tab="eksplorasi">2. Eksplorasi</button>
+  <button data-tab="fs">3. Studi Kelayakan</button>
+  <button data-tab="pengembangan">4. Pengembangan</button>
+  <button data-tab="peralatan">🚜 Peralatan</button>
+  <button data-tab="karyawan">👥 Karyawan</button>
+  <button data-tab="eksploitasi">5. Eksploitasi</button>
+  <button data-tab="penjualan">6. Penjualan</button>
+  <button data-tab="reklamasi">7. Reklamasi</button>
+  <button data-tab="pascatambang">8. Pasca Tambang</button>
+  <button data-tab="timeline">📅 Timeline</button>
+  <button data-tab="regulasi">📋 Regulasi</button>
+  <button data-tab="pengaturan">⚙️ Pengaturan</button>
+</nav>
+
+<main>
+
+<!-- ========== DASHBOARD ========== -->
+<section id="tab-dashboard" class="tab-content active">
+  <h2>Dashboard Keekonomian</h2>
+  <div class="reg-note"><b>Metodologi:</b> Discounted Cash Flow (DCF) sesuai praktik <i>mining economics</i>. Semua data tersimpan otomatis di browser.</div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+  <div class="two-col">
+    <div class="panel">
+      <h3>📊 Arus Kas Proyek (USD)</h3>
+      <div class="table-scroll">
+        <table id="cfTable"><thead><tr><th>Th</th><th>Tahap</th><th>Arus Kas</th><th>Kumulatif</th><th>DF</th><th>PV</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>🎯 Analisis Sensitivitas</h3>
+      <table id="sensTable"><thead><tr><th>Skenario</th><th>NPV</th><th>IRR</th><th>Status</th></tr></thead><tbody></tbody></table>
+      <h3 style="margin-top:16px">📈 NPV vs Discount Rate</h3>
+      <table id="discTable"><thead><tr><th>Rate</th><th>NPV</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>💵 Struktur Biaya Total (Life of Mine)</h3>
+    <div id="costBars"></div>
+  </div>
+  <div class="disclaimer">⚠️ <b>Disclaimer:</b> Aplikasi ini adalah alat bantu estimasi keekonomian. Hasil bersifat indikatif dan bukan pengganti FS komprehensif oleh Konsultan/CP bersertifikat sesuai Kode KCMI.</div>
+</section>
+
+<!-- ========== PROSPEKSI ========== -->
+<section id="tab-prospeksi" class="tab-content">
+  <h2>1. Tahap Prospeksi</h2>
+  <div class="reg-note"><b>Acuan:</b> UU No. 3/2020, PP No. 96/2021, Permen ESDM No. 26/2018, Permen ESDM No. 11/2018. Kegiatan untuk menemukan indikasi mineral/batubara dalam WIUP.</div>
+  <div class="grid">
+    <div class="field"><label>Durasi Prospeksi (tahun)</label><input type="number" min="1" step="1" data-phase-dur="prospeksi"></div>
+  </div>
+  <div class="panel">
+    <h3>Rincian Biaya Prospeksi</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item Biaya</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-prospeksi"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('prospeksi')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL PROSPEKSI</b></span><span id="subtotal-prospeksi" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== EKSPLORASI ========== -->
+<section id="tab-eksplorasi" class="tab-content">
+  <h2>2. Tahap Eksplorasi</h2>
+  <div class="reg-note"><b>Acuan:</b> Permen ESDM No. 26/2018, Kode KCMI. Menaikkan status sumber daya menjadi cadangan terukur.</div>
+  <div class="grid">
+    <div class="field"><label>Durasi Eksplorasi (tahun)</label><input type="number" min="1" step="1" data-phase-dur="eksplorasi"></div>
+  </div>
+  <div class="panel">
+    <h3>Rincian Biaya Eksplorasi</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item Biaya</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-eksplorasi"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('eksplorasi')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL EKSPLORASI</b></span><span id="subtotal-eksplorasi" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== FS ========== -->
+<section id="tab-fs" class="tab-content">
+  <h2>3. Studi Kelayakan (FS)</h2>
+  <div class="reg-note"><b>Acuan:</b> UU No. 32/2009, PP No. 22/2021, Permen ESDM No. 26/2018. Wajib sebelum konstruksi &amp; produksi.</div>
+  <div class="grid">
+    <div class="field"><label>Durasi FS (tahun)</label><input type="number" min="1" step="1" data-phase-dur="fs"></div>
+  </div>
+  <div class="panel">
+    <h3>Rincian Biaya FS</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item Biaya</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-fs"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('fs')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL FS</b></span><span id="subtotal-fs" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== PENGEMBANGAN ========== -->
+<section id="tab-pengembangan" class="tab-content">
+  <h2>4. Pengembangan (Development / Konstruksi)</h2>
+  <div class="reg-note"><b>Acuan:</b> Permen ESDM No. 26/2018, PP No. 96/2021, UU No. 7/2021. CAPEX besar — perlu kontinjensi &amp; working capital. <b>Catatan:</b> Peralatan dikelola di tab 🚜 Peralatan dan otomatis ditambahkan ke CAPEX.</div>
+  <div class="grid">
+    <div class="field"><label>Durasi Konstruksi (tahun)</label><input type="number" min="1" step="1" data-phase-dur="pengembangan"></div>
+    <div class="field"><label>Kontinjensi (%)</label><input type="number" step="0.1" data-setting="contingencyPct"></div>
+    <div class="field"><label>Working Capital (USD)</label><input type="number" data-setting="workingCapital"></div>
+  </div>
+  <div class="panel">
+    <h3>Rincian Biaya CAPEX (Non-Equipment)</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item Biaya</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-pengembangan"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('pengembangan')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px"><span>Subtotal Item Konstruksi</span><span id="capex-items">$0</span></div>
+    <div class="summary-line"><span>Equipment CAPEX (dari tab Peralatan)</span><span id="capex-equip">$0</span></div>
+    <div class="summary-line"><span>Kontinjensi</span><span id="capex-cont">$0</span></div>
+    <div class="summary-line" style="font-size:15px;color:var(--accent);border-top:2px solid var(--accent);padding-top:8px"><span><b>TOTAL CAPEX</b></span><span id="capex-total">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== PERALATAN ========== -->
+<section id="tab-peralatan" class="tab-content">
+  <h2>Manajemen Peralatan (Fleet)</h2>
+  <div class="reg-note"><b>Acuan:</b> Permen ESDM No. 26/2018 (Good Mining Practice). Peralatan menghasilkan <b>CAPEX</b> (pembelian) dan <b>OPEX</b> (BBM + maintenance). Biaya operator masuk ke tab 👥 Karyawan.</div>
+  <div class="panel">
+    <h3>Daftar Peralatan</h3>
+    <div class="table-scroll">
+      <table><thead><tr>
+        <th style="width:22%">Nama Alat</th><th>Qty</th><th>Harga/Unit</th><th>Life (th)</th>
+        <th>Jam/Th</th><th>BBM L/jam</th><th>Harga BBM $/L</th><th>Maint %</th>
+        <th>CAPEX</th><th>OPEX/th</th><th></th>
+      </tr></thead><tbody id="tbody-equipment"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addEquipment()">+ Tambah Peralatan</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL CAPEX PERALATAN</b></span><span id="eq-capex-total" style="color:var(--accent)">$0</span></div>
+    <div class="summary-line" style="font-size:14px"><span><b>TOTAL OPEX PERALATAN / TAHUN</b></span><span id="eq-opex-total" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== KARYAWAN ========== -->
+<section id="tab-karyawan" class="tab-content">
+  <h2>Manajemen Karyawan (HR)</h2>
+  <div class="reg-note"><b>Acuan:</b> UU No. 13/2003 &amp; UU No. 11/2020 (Cipta Kerja — Ketenagakerjaan), PP No. 78/2015 (Pengupahan). Biaya karyawan otomatis masuk OPEX.</div>
+  <div class="panel">
+    <h3>Daftar Karyawan</h3>
+    <div class="table-scroll">
+      <table><thead><tr>
+        <th style="width:30%">Jabatan</th><th>Jumlah</th><th>Gaji/Bulan (USD)</th><th>Benefit (%)</th><th>Total/Th</th><th></th>
+      </tr></thead><tbody id="tbody-employees"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addEmployee()">+ Tambah Posisi</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL BIAYA KARYAWAN / TAHUN</b></span><span id="emp-total" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== EKSPLOITASI ========== -->
+<section id="tab-eksploitasi" class="tab-content">
+  <h2>5. Eksploitasi (Operasi)</h2>
+  <div class="reg-note"><b>Acuan:</b> Permen ESDM No. 26/2018, UU No. 3/2020. Parameter kunci: cadangan, laju produksi, kadar, recovery, stripping ratio.</div>
+  <h3>Parameter Produksi</h3>
+  <div class="grid">
+    <div class="field"><label>Cadangan (Juta Ton)</label><input type="number" step="0.1" data-exploit="reserve"></div>
+    <div class="field"><label>Laju Produksi (Juta Ton/Th)</label><input type="number" step="0.01" data-exploit="production"></div>
+    <div class="field"><label>Kadar (Grade)</label><input type="number" step="0.01" data-exploit="grade"></div>
+    <div class="field"><label>Satuan Kadar</label><select data-exploit="gradeUnit"><option value="g/t">g/t</option><option value="%">%</option><option value="kg/t">kg/t</option><option value="oz/t">oz/t</option></select></div>
+    <div class="field"><label>Recovery (%)</label><input type="number" step="0.1" data-exploit="recovery"></div>
+    <div class="field"><label>Harga Jual</label><input type="number" step="1" data-exploit="price"></div>
+    <div class="field"><label>Satuan Harga</label><select data-exploit="priceUnit"><option value="$/oz">$/oz</option><option value="$/t">$/t</option><option value="$/lb">$/lb</option><option value="$/g">$/g</option></select></div>
+    <div class="field"><label>Stripping Ratio (W:O)</label><input type="number" step="0.1" data-exploit="sr"></div>
+  </div>
+  <h3>Biaya Operasi (Unit Cost)</h3>
+  <div class="grid">
+    <div class="field"><label>Mining Cost ($/t ore)</label><input type="number" step="0.1" data-exploit="miningCost"></div>
+    <div class="field"><label>Processing Cost ($/t ore)</label><input type="number" step="0.1" data-exploit="processingCost"></div>
+    <div class="field"><label>Waste Mining Cost ($/t waste)</label><input type="number" step="0.1" data-exploit="wasteCost"></div>
+    <div class="field"><label>G&amp;A Fixed (USD/tahun)</label><input type="number" data-exploit="gaAnnual"></div>
+  </div>
+  <h3>Biaya OPEX Tambahan (opsional)</h3>
+  <div class="panel">
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total/th</th><th></th></tr></thead>
+      <tbody id="tbody-exploit-items"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addExploitItem()">+ Tambah Item OPEX</button>
+  </div>
+  <div class="panel">
+    <h3>Ringkasan Operasi</h3>
+    <div class="summary-line"><span>Umur Tambang</span><span id="op-life">-</span></div>
+    <div class="summary-line"><span>Produksi Produk / Tahun</span><span id="op-product">-</span></div>
+    <div class="summary-line"><span>Pendapatan / Tahun</span><span id="op-revenue">-</span></div>
+    <div class="summary-line"><span>Total OPEX / Tahun</span><span id="op-opex">-</span></div>
+  </div>
+</section>
+
+<!-- ========== PENJUALAN ========== -->
+<section id="tab-penjualan" class="tab-content">
+  <h2>6. Penjualan &amp; Kewajiban Fiskal</h2>
+  <div class="reg-note"><b>Acuan:</b> UU No. 3/2020, PP No. 15/2022, PP No. 96/2021, UU No. 7/2021 (HPP). Royalti mineral 2–4%, batubara 3–7%. PPh Badan 22%.</div>
+  <div class="grid">
+    <div class="field"><label>Royalti / PNBP Produksi (%)</label><input type="number" step="0.1" data-sales="royalty"></div>
+    <div class="field"><label>Iuran Tetap ($/ha/tahun)</label><input type="number" step="0.01" data-sales="iuranTetap"></div>
+    <div class="field"><label>Luas WIUP (ha)</label><input type="number" data-sales="area"></div>
+    <div class="field"><label>Biaya Pemasaran ($/t ore)</label><input type="number" step="0.1" data-sales="marketing"></div>
+    <div class="field"><label>Freight / Logistik ($/t ore)</label><input type="number" step="0.1" data-sales="freight"></div>
+    <div class="field"><label>PPh Badan (%)</label><input type="number" step="0.1" data-sales="tax"></div>
+    <div class="field"><label>Discount Rate / WACC (%)</label><input type="number" step="0.1" data-sales="discount"></div>
+  </div>
+  <div class="panel">
+    <h3>Ringkasan Fiskal</h3>
+    <div class="summary-line"><span>Royalti / Tahun</span><span id="sal-roy">-</span></div>
+    <div class="summary-line"><span>Iuran Tetap / Tahun</span><span id="sal-iur">-</span></div>
+    <div class="summary-line"><span>PPh Badan (rata-rata/th)</span><span id="sal-tax">-</span></div>
+  </div>
+</section>
+
+<!-- ========== REKLAMASI ========== -->
+<section id="tab-reklamasi" class="tab-content">
+  <h2>7. Reklamasi</h2>
+  <div class="reg-note"><b>Acuan:</b> PP No. 78/2010, Permen ESDM No. 7/2014, Permen ESDM No. 26/2018. Wajib Rencana Reklamasi 5 tahunan &amp; Jaminan Reklamasi.</div>
+  <div class="grid">
+    <div class="field"><label>Durasi Reklamasi (tahun)</label><input type="number" min="1" step="1" data-phase-dur="reklamasi"></div>
+  </div>
+  <div class="panel">
+    <h3>Rincian Biaya Reklamasi</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:40%">Item</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-reklamasi"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('reklamasi')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px;font-size:14px"><span><b>TOTAL REKLAMASI</b></span><span id="subtotal-reklamasi" style="color:var(--accent)">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== PASCA TAMBANG ========== -->
+<section id="tab-pascatambang" class="tab-content">
+  <h2>8. Pasca Tambang</h2>
+  <div class="reg-note"><b>Acuan:</b> PP No. 78/2010, Permen ESDM No. 7/2014. Pasca tambang bersifat <b>perpetual</b> — perlu Jaminan Pasca Tambang &amp; dana abadi. Centang "Perpetual" untuk biaya tahunan berulang.</div>
+  <div class="panel">
+    <h3>Rincian Biaya Pasca Tambang</h3>
+    <div class="table-scroll">
+      <table><thead><tr><th style="width:35%">Item</th><th>Qty</th><th>Satuan</th><th>Harga Satuan</th><th>Perpetual?</th><th>Total</th><th></th></tr></thead>
+      <tbody id="tbody-pascatambang"></tbody></table>
+    </div>
+    <button class="btn-add" onclick="addPhaseItem('pascatambang')">+ Tambah Item</button>
+    <div class="summary-line" style="margin-top:12px"><span>Biaya One-time</span><span id="pt-onetime">$0</span></div>
+    <div class="summary-line"><span>Biaya Perpetual (per tahun)</span><span id="pt-perp-annual">$0</span></div>
+    <div class="summary-line"><span>PV Perpetual (diskonto)</span><span id="pt-perp-pv">$0</span></div>
+    <div class="summary-line" style="font-size:14px;color:var(--accent);border-top:2px solid var(--accent);padding-top:8px"><span><b>TOTAL PV PASCA TAMBANG</b></span><span id="pt-total">$0</span></div>
+  </div>
+</section>
+
+<!-- ========== TIMELINE ========== -->
+<section id="tab-timeline" class="tab-content">
+  <h2>Kegiatan Proyek — Timeline</h2>
+  <div class="reg-note">Visualisasi seluruh tahapan proyek dari prospeksi hingga pasca tambang.</div>
+  <div class="panel">
+    <h3>📅 Gantt Chart</h3>
+    <div id="timelineView"></div>
+  </div>
+</section>
+
+<!-- ========== REGULASI ========== -->
+<section id="tab-regulasi" class="tab-content">
+  <h2>Regulasi Terkait</h2>
+  <div class="reg-note">Daftar peraturan acuan perhitungan. Wajib diperbarui sesuai perubahan peraturan.</div>
+  <div class="reg-list">
+    <div class="reg-item"><div class="reg-title">UU No. 3 Tahun 2020</div><div class="reg-desc">Perubahan UU No. 4/2009 tentang Minerba — perizinan, royalti, divestasi, pasca tambang.</div></div>
+    <div class="reg-item"><div class="reg-title">PP No. 96 Tahun 2021</div><div class="reg-desc">Jenis dan Tarif PNBP — royalti, iuran tetap.</div></div>
+    <div class="reg-item"><div class="reg-title">PP No. 15 Tahun 2022</div><div class="reg-desc">Perlakuan Pajak &amp; PNBP Sektor ESDM.</div></div>
+    <div class="reg-item"><div class="reg-title">PP No. 78 Tahun 2010</div><div class="reg-desc">Reklamasi &amp; Pasca Tambang.</div></div>
+    <div class="reg-item"><div class="reg-title">PP No. 22 Tahun 2021</div><div class="reg-desc">PPLH — AMDAL/UKL-UPL.</div></div>
+    <div class="reg-item"><div class="reg-title">Permen ESDM No. 26 Tahun 2018</div><div class="reg-desc">Good Mining Practice.</div></div>
+    <div class="reg-item"><div class="reg-title">Permen ESDM No. 7 Tahun 2014</div><div class="reg-desc">Reklamasi &amp; Pasca Tambang.</div></div>
+    <div class="reg-item"><div class="reg-title">Permen ESDM No. 11 Tahun 2018</div><div class="reg-desc">WIUP &amp; Perizinan.</div></div>
+    <div class="reg-item"><div class="reg-title">Permen ESDM No. 1827 K/30/MEM/2018</div><div class="reg-desc">Pedoman Good Mining Practice.</div></div>
+    <div class="reg-item"><div class="reg-title">UU No. 32 Tahun 2009</div><div class="reg-desc">PPLH.</div></div>
+    <div class="reg-item"><div class="reg-title">UU No. 7 Tahun 2021 (HPP)</div><div class="reg-desc">PPh Badan 22%, PPN 11%.</div></div>
+    <div class="reg-item"><div class="reg-title">UU No. 13/2003 &amp; UU No. 11/2020</div><div class="reg-desc">Ketenagakerjaan.</div></div>
+    <div class="reg-item"><div class="reg-title">Kode KCMI</div><div class="reg-desc">Pelaporan Eksplorasi, Sumber Daya, Cadangan.</div></div>
+  </div>
+</section>
+
+<!-- ========== PENGATURAN ========== -->
+<section id="tab-pengaturan" class="tab-content">
+  <h2>Pengaturan &amp; Backup</h2>
+  <div class="install-box" id="installBox" style="display:none">
+    <h3>📲 Install Aplikasi</h3>
+    <p>Install MineEcon Pro sebagai aplikasi di perangkat Anda. Setelah diinstall, dapat dibuka tanpa browser.</p>
+    <button class="btn" onclick="installApp()">📲 Install Sekarang</button>
+  </div>
+  <div class="panel">
+    <h3>💾 Backup &amp; Restore Data</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Data tersimpan otomatis di browser. Untuk keamanan, lakukan export secara berkala.</p>
+    <div class="actions">
+      <button class="btn" onclick="exportData()">📥 Export JSON</button>
+      <button class="btn secondary" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+      <button class="btn danger" onclick="resetAll()">🗑️ Reset ke Default</button>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>ℹ️ Informasi</h3>
+    <div class="summary-line"><span>Versi</span><span>MineEcon Pro v2.0</span></div>
+    <div class="summary-line"><span>Data terakhir disimpan</span><span id="lastSaved">-</span></div>
+    <div class="summary-line"><span>Storage</span><span>localStorage (browser)</span></div>
+    <div class="summary-line"><span>Kurs referensi</span><span>≈ Rp 15.500 / USD</span></div>
+  </div>
+</section>
+
+</main>
+
+<div class="save-indicator" id="saveIndicator">✓ Tersimpan</div>
+<footer>MineEcon Pro v2.0 · Kalkulator Keekonomian Pertambangan · Semua nilai dalam USD</footer>
+
+<script>
+// ============ UTILS ============
+const $ = id => document.getElementById(id);
+const FMT = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
+const FMT2 = new Intl.NumberFormat('en-US',{maximumFractionDigits:2});
+const money = v => { const s = v<0?'-':''; const a = Math.abs(v);
+  if (a>=1e9) return s+'$'+FMT2.format(a/1e9)+' M';
+  if (a>=1e6) return s+'$'+FMT2.format(a/1e6)+' M';
+  if (a>=1e3) return s+'$'+FMT.format(a);
+  return s+'$'+FMT2.format(a); };
+const moneyFull = v => (v<0?'-':'')+'$'+FMT.format(Math.abs(v));
+const escapeHtml = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ============ DATA MODEL ============
+const STORAGE_KEY = 'mineEconPro_v2';
+
+const defaultData = () => ({
+  phases: {
+    prospeksi: { duration: 1, items: [
+      {name:'Survei Umum & Pengumpulan Data', qty:1, unit:'ls', rate:50000},
+      {name:'Pemetaan Geologi Regional', qty:1, unit:'ls', rate:100000},
+      {name:'Geokimia', qty:1, unit:'ls', rate:80000},
+      {name:'Geofisika', qty:1, unit:'ls', rate:150000},
+      {name:'Logistik & Perizinan', qty:1, unit:'ls', rate:120000}
+    ]},
+    eksplorasi: { duration: 2, items: [
+      {name:'Pemboran Eksplorasi', qty:1, unit:'ls', rate:1500000},
+      {name:'Analisis Laboratorium', qty:1, unit:'ls', rate:200000},
+      {name:'Pemetaan Geologi Detail', qty:1, unit:'ls', rate:150000},
+      {name:'Pemodelan Sumber Daya', qty:1, unit:'ls', rate:250000},
+      {name:'Geoteknik & Hidrogeologi', qty:1, unit:'ls', rate:300000},
+      {name:'Kontinjensi', qty:1, unit:'ls', rate:100000}
+    ]},
+    fs: { duration: 1, items: [
+      {name:'Konsultan FS', qty:1, unit:'ls', rate:500000},
+      {name:'Uji Metalurgi / Pilot Plant', qty:1, unit:'ls', rate:800000},
+      {name:'AMDAL / UKL-UPL', qty:1, unit:'ls', rate:200000},
+      {name:'Perizinan & Legal', qty:1, unit:'ls', rate:300000},
+      {name:'Peer Review FS', qty:1, unit:'ls', rate:100000}
+    ]},
+    pengembangan: { duration: 2, items: [
+      {name:'Land Acquisition', qty:1, unit:'ls', rate:2000000},
+      {name:'Site Preparation & Earthworks', qty:1, unit:'ls', rate:3000000},
+      {name:'Infrastruktur (jalan, listrik, air)', qty:1, unit:'ls', rate:8000000},
+      {name:'Processing Plant', qty:1, unit:'ls', rate:25000000},
+      {name:'Tailings Management', qty:1, unit:'ls', rate:5000000},
+      {name:'EPCM & Owner Cost', qty:1, unit:'ls', rate:2000000}
+    ]},
+    reklamasi: { duration: 2, items: [
+      {name:'Earthworks / Regrading', qty:500, unit:'ha', rate:8000},
+      {name:'Revegetasi', qty:500, unit:'ha', rate:5000},
+      {name:'Monitoring & Maintenance', qty:500, unit:'ha', rate:2000}
+    ]},
+    pascatambang: { duration: 1, items: [
+      {name:'Water Treatment', qty:1, unit:'tahun', rate:120000, perpetual:true},
+      {name:'Maintenance Fasilitas', qty:1, unit:'ls', rate:2000000, perpetual:false},
+      {name:'Monitoring Lingkungan', qty:1, unit:'tahun', rate:80000, perpetual:true}
+    ]}
+  },
+  equipment: [
+    {name:'Excavator PC2000', qty:2, price:1500000, life:8, hoursPerYear:5000, fuelPerHour:40, fuelPrice:1.0, maintPct:15},
+    {name:'Dump Truck HD785', qty:8, price:600000, life:6, hoursPerYear:5000, fuelPerHour:25, fuelPrice:1.0, maintPct:12},
+    {name:'Drill Rig', qty:1, price:800000, life:7, hoursPerYear:4000, fuelPerHour:15, fuelPrice:1.0, maintPct:10},
+    {name:'Wheel Loader WA800', qty:1, price:700000, life:8, hoursPerYear:4500, fuelPerHour:30, fuelPrice:1.0, maintPct:12}
+  ],
+  employees: [
+    {position:'Mine Manager', count:1, salary:8000, benefitsPct:30},
+    {position:'Mine Engineer', count:3, salary:3500, benefitsPct:25},
+    {position:'Geologist', count:2, salary:3000, benefitsPct:25},
+    {position:'Surveyor', count:2, salary:2000, benefitsPct:20},
+    {position:'Mine Supervisor', count:4, salary:2500, benefitsPct:20},
+    {position:'Equipment Operator', count:20, salary:800, benefitsPct:15},
+    {position:'HSE Officer', count:3, salary:2200, benefitsPct:20},
+    {position:'Admin & Finance', count:5, salary:1200, benefitsPct:15}
+  ],
+  exploitation: {
+    reserve:5, production:0.5, grade:3, gradeUnit:'g/t', recovery:90,
+    price:1800, priceUnit:'$/oz', miningCost:35, processingCost:18,
+    gaAnnual:5000000, sr:3, wasteCost:3,
+    items:[]
+  },
+  sales: { royalty:4, iuranTetap:0.32, area:5000, marketing:2, freight:8, tax:22, discount:10 },
+  settings: { contingencyPct:15, workingCapital:3000000 }
+});
+
+let DATA = loadData() || defaultData();
+
+function loadData() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+    $('lastSaved').textContent = new Date().toLocaleString('id-ID');
+    showSaveIndicator();
+  } catch(e){}
+}
+let saveTimer;
+function showSaveIndicator() {
+  const el = $('saveIndicator');
+  el.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>el.classList.remove('show'), 1200);
+}
+
+// ============ TABS ============
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    $('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ============ RENDER: PHASE TABLES ============
+function renderPhase(phaseKey) {
+  const phase = DATA.phases[phaseKey];
+  const tbody = $('tbody-'+phaseKey);
+  if (!tbody) return;
+  tbody.innerHTML = phase.items.map((item, idx) => {
+    const isPasca = phaseKey === 'pascatambang';
+    return `<tr>
+      <td><input type="text" data-phase="${phaseKey}" data-idx="${idx}" data-field="name" value="${escapeHtml(item.name)}"></td>
+      <td><input type="number" step="any" data-phase="${phaseKey}" data-idx="${idx}" data-field="qty" value="${item.qty}"></td>
+      <td><input type="text" data-phase="${phaseKey}" data-idx="${idx}" data-field="unit" value="${escapeHtml(item.unit)}"></td>
+      <td><input type="number" step="any" data-phase="${phaseKey}" data-idx="${idx}" data-field="rate" value="${item.rate}"></td>
+      ${isPasca?`<td><input type="checkbox" data-phase="${phaseKey}" data-idx="${idx}" data-field="perpetual" ${item.perpetual?'checked':''} style="width:auto;cursor:pointer"></td>`:''}
+      <td class="item-total" style="font-weight:600">${moneyFull(item.qty*item.rate)}</td>
+      <td><button class="btn-del" data-action="del-phase" data-phase="${phaseKey}" data-idx="${idx}">×</button></td>
+    </tr>`;
+  }).join('');
+  updatePhaseSubtotal(phaseKey);
+}
+
+function updatePhaseSubtotal(phaseKey) {
+  const total = DATA.phases[phaseKey].items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const el = $('subtotal-'+phaseKey);
+  if (el) el.textContent = moneyFull(total);
+}
+
+function addPhaseItem(phaseKey) {
+  DATA.phases[phaseKey].items.push({name:'Item baru', qty:1, unit:'ls', rate:0, perpetual:false});
+  saveData(); renderPhase(phaseKey); recalc();
+}
+
+// ============ RENDER: EQUIPMENT ============
+function renderEquipment() {
+  const tbody = $('tbody-equipment');
+  tbody.innerHTML = DATA.equipment.map((eq, idx) => {
+    const capex = eq.qty * eq.price;
+    const opex = eq.qty * (eq.hoursPerYear * eq.fuelPerHour * eq.fuelPrice + eq.price * eq.maintPct/100);
+    return `<tr>
+      <td><input type="text" data-eq-idx="${idx}" data-field="name" value="${escapeHtml(eq.name)}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="qty" value="${eq.qty}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="price" value="${eq.price}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="life" value="${eq.life}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="hoursPerYear" value="${eq.hoursPerYear}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="fuelPerHour" value="${eq.fuelPerHour}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="fuelPrice" value="${eq.fuelPrice}"></td>
+      <td><input type="number" step="any" data-eq-idx="${idx}" data-field="maintPct" value="${eq.maintPct}"></td>
+      <td class="eq-capex" style="font-weight:600;color:var(--accent2)">${moneyFull(capex)}</td>
+      <td class="eq-opex" style="font-weight:600;color:var(--accent)">${moneyFull(opex)}</td>
+      <td><button class="btn-del" data-action="del-eq" data-idx="${idx}">×</button></td>
+    </tr>`;
+  }).join('');
+  const totCapex = DATA.equipment.reduce((s,e)=>s+e.qty*e.price,0);
+  const totOpex = DATA.equipment.reduce((s,e)=>s+e.qty*(e.hoursPerYear*e.fuelPerHour*e.fuelPrice + e.price*e.maintPct/100),0);
+  $('eq-capex-total').textContent = moneyFull(totCapex);
+  $('eq-opex-total').textContent = moneyFull(totOpex);
+}
+function addEquipment() {
+  DATA.equipment.push({name:'Alat Baru', qty:1, price:0, life:5, hoursPerYear:4000, fuelPerHour:20, fuelPrice:1.0, maintPct:10});
+  saveData(); renderEquipment(); recalc();
+}
+
+// ============ RENDER: EMPLOYEES ============
+function renderEmployees() {
+  const tbody = $('tbody-employees');
+  tbody.innerHTML = DATA.employees.map((e, idx) => {
+    const total = e.count * e.salary * 12 * (1 + e.benefitsPct/100);
+    return `<tr>
+      <td><input type="text" data-emp-idx="${idx}" data-field="position" value="${escapeHtml(e.position)}"></td>
+      <td><input type="number" step="any" data-emp-idx="${idx}" data-field="count" value="${e.count}"></td>
+      <td><input type="number" step="any" data-emp-idx="${idx}" data-field="salary" value="${e.salary}"></td>
+      <td><input type="number" step="any" data-emp-idx="${idx}" data-field="benefitsPct" value="${e.benefitsPct}"></td>
+      <td class="emp-total" style="font-weight:600;color:var(--accent)">${moneyFull(total)}</td>
+      <td><button class="btn-del" data-action="del-emp" data-idx="${idx}">×</button></td>
+    </tr>`;
+  }).join('');
+  const total = DATA.employees.reduce((s,e)=>s+e.count*e.salary*12*(1+e.benefitsPct/100),0);
+  $('emp-total').textContent = moneyFull(total);
+}
+function addEmployee() {
+  DATA.employees.push({position:'Posisi Baru', count:1, salary:1000, benefitsPct:20});
+  saveData(); renderEmployees(); recalc();
+}
+
+// ============ RENDER: EXPLOIT ITEMS ============
+function renderExploitItems() {
+  const tbody = $('tbody-exploit-items');
+  tbody.innerHTML = DATA.exploitation.items.map((item, idx) => `<tr>
+    <td><input type="text" data-exitem-idx="${idx}" data-field="name" value="${escapeHtml(item.name)}"></td>
+    <td><input type="number" step="any" data-exitem-idx="${idx}" data-field="qty" value="${item.qty}"></td>
+    <td><input type="text" data-exitem-idx="${idx}" data-field="unit" value="${escapeHtml(item.unit)}"></td>
+    <td><input type="number" step="any" data-exitem-idx="${idx}" data-field="rate" value="${item.rate}"></td>
+    <td style="font-weight:600">${moneyFull(item.qty*item.rate)}</td>
+    <td><button class="btn-del" data-action="del-exitem" data-idx="${idx}">×</button></td>
+  </tr>`).join('');
+}
+function addExploitItem() {
+  DATA.exploitation.items.push({name:'Item OPEX', qty:1, unit:'ls', rate:0});
+  saveData(); renderExploitItems(); recalc();
+}
+
+// ============ RENDER: FORM INPUTS ============
+function renderForms() {
+  // Phase durations
+  document.querySelectorAll('[data-phase-dur]').forEach(inp => {
+    inp.value = DATA.phases[inp.dataset.phaseDur].duration;
+  });
+  // Exploitation
+  document.querySelectorAll('[data-exploit]').forEach(inp => {
+    inp.value = DATA.exploitation[inp.dataset.exploit];
+  });
+  // Sales
+  document.querySelectorAll('[data-sales]').forEach(inp => {
+    inp.value = DATA.sales[inp.dataset.sales];
+  });
+  // Settings
+  document.querySelectorAll('[data-setting]').forEach(inp => {
+    inp.value = DATA.settings[inp.dataset.setting];
+  });
+}
+
+// ============ EVENT DELEGATION ============
+document.addEventListener('input', e => {
+  const t = e.target;
+  // Phase items
+  if (t.dataset.phase && t.dataset.idx !== undefined && t.dataset.field) {
+    const phase = t.dataset.phase, idx = +t.dataset.idx, field = t.dataset.field;
+    let val;
+    if (t.type === 'checkbox') val = t.checked;
+    else if (t.type === 'number') val = +t.value || 0;
+    else val = t.value;
+    DATA.phases[phase].items[idx][field] = val;
+    saveData();
+    // Update row total
+    const item = DATA.phases[phase].items[idx];
+    const row = t.closest('tr');
+    if (row) { const tt = row.querySelector('.item-total'); if (tt) tt.textContent = moneyFull(item.qty*item.rate); }
+    updatePhaseSubtotal(phase);
+    recalc();
+    return;
+  }
+  // Equipment
+  if (t.dataset.eqIdx !== undefined && t.dataset.field) {
+    const idx = +t.dataset.eqIdx, field = t.dataset.field;
+    const val = t.type === 'number' ? (+t.value||0) : t.value;
+    DATA.equipment[idx][field] = val;
+    saveData();
+    const eq = DATA.equipment[idx];
+    const row = t.closest('tr');
+    if (row) {
+      row.querySelector('.eq-capex').textContent = moneyFull(eq.qty*eq.price);
+      row.querySelector('.eq-opex').textContent = moneyFull(eq.qty*(eq.hoursPerYear*eq.fuelPerHour*eq.fuelPrice + eq.price*eq.maintPct/100));
+    }
+    const totCapex = DATA.equipment.reduce((s,e)=>s+e.qty*e.price,0);
+    const totOpex = DATA.equipment.reduce((s,e)=>s+e.qty*(e.hoursPerYear*e.fuelPerHour*e.fuelPrice + e.price*e.maintPct/100),0);
+    $('eq-capex-total').textContent = moneyFull(totCapex);
+    $('eq-opex-total').textContent = moneyFull(totOpex);
+    recalc();
+    return;
+  }
+  // Employees
+  if (t.dataset.empIdx !== undefined && t.dataset.field) {
+    const idx = +t.dataset.empIdx, field = t.dataset.field;
+    const val = t.type === 'number' ? (+t.value||0) : t.value;
+    DATA.employees[idx][field] = val;
+    saveData();
+    const e2 = DATA.employees[idx];
+    const row = t.closest('tr');
+    if (row) { const tt = row.querySelector('.emp-total'); if (tt) tt.textContent = moneyFull(e2.count*e2.salary*12*(1+e2.benefitsPct/100)); }
+    const total = DATA.employees.reduce((s,em)=>s+em.count*em.salary*12*(1+em.benefitsPct/100),0);
+    $('emp-total').textContent = moneyFull(total);
+    recalc();
+    return;
+  }
+  // Exploit items
+  if (t.dataset.exitemIdx !== undefined && t.dataset.field) {
+    const idx = +t.dataset.exitemIdx, field = t.dataset.field;
+    const val = t.type === 'number' ? (+t.value||0) : t.value;
+    DATA.exploitation.items[idx][field] = val;
+    saveData();
+    renderExploitItems(); recalc();
+    return;
+  }
+  // Exploitation params
+  if (t.dataset.exploit) {
+    DATA.exploitation[t.dataset.exploit] = t.type === 'number' ? (+t.value||0) : t.value;
+    saveData(); recalc();
+    return;
+  }
+  // Sales params
+  if (t.dataset.sales) {
+    DATA.sales[t.dataset.sales] = t.type === 'number' ? (+t.value||0) : t.value;
+    saveData(); recalc();
+    return;
+  }
+  // Settings
+  if (t.dataset.setting) {
+    DATA.settings[t.dataset.setting] = +t.value || 0;
+    saveData(); recalc();
+    return;
+  }
+  // Phase duration
+  if (t.dataset.phaseDur) {
+    DATA.phases[t.dataset.phaseDur].duration = Math.max(1, +t.value || 1);
+    saveData(); recalc();
+    return;
+  }
+});
+
+// Delete buttons
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === 'del-phase') {
+    if (!confirm('Hapus item ini?')) return;
+    const phase = btn.dataset.phase, idx = +btn.dataset.idx;
+    DATA.phases[phase].items.splice(idx, 1);
+    saveData(); renderPhase(phase); recalc();
+  } else if (action === 'del-eq') {
+    if (!confirm('Hapus peralatan ini?')) return;
+    DATA.equipment.splice(+btn.dataset.idx, 1);
+    saveData(); renderEquipment(); recalc();
+  } else if (action === 'del-emp') {
+    if (!confirm('Hapus posisi ini?')) return;
+    DATA.employees.splice(+btn.dataset.idx, 1);
+    saveData(); renderEmployees(); recalc();
+  } else if (action === 'del-exitem') {
+    if (!confirm('Hapus item OPEX ini?')) return;
+    DATA.exploitation.items.splice(+btn.dataset.idx, 1);
+    saveData(); renderExploitItems(); recalc();
+  }
+});
+
+// ============ PRODUCT CALC ============
+function containedInPriceUnit(oreTons, grade, gradeUnit, recoveryPct, priceUnit) {
+  let gPerT;
+  switch(gradeUnit){
+    case 'g/t': gPerT = grade; break;
+    case '%': gPerT = grade * 10000; break;
+    case 'kg/t': gPerT = grade * 1000; break;
+    case 'oz/t': gPerT = grade * 31.1035; break;
+    default: gPerT = grade;
+  }
+  const totalGrams = oreTons * gPerT * (recoveryPct/100);
+  switch(priceUnit){
+    case '$/oz': return totalGrams / 31.1035;
+    case '$/g': return totalGrams;
+    case '$/kg': return totalGrams / 1000;
+    case '$/t': return totalGrams / 1e6;
+    case '$/lb': return totalGrams / 453.592;
+    default: return 0;
+  }
+}
+
+// ============ CASH FLOW MODEL ============
+function buildModel() {
+  const d = DATA;
+  const prospeksiCost = d.phases.prospeksi.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const eksplorasiCost = d.phases.eksplorasi.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const fsCost = d.phases.fs.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const capexItems = d.phases.pengembangan.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const equipCapex = d.equipment.reduce((s,e)=>s+e.qty*e.price,0);
+  const capexPreCont = capexItems + equipCapex;
+  const capex = capexPreCont * (1 + d.settings.contingencyPct/100);
+  
+  const ore = d.exploitation.production * 1e6;
+  const annualProduct = containedInPriceUnit(ore, d.exploitation.grade, d.exploitation.gradeUnit, d.exploitation.recovery, d.exploitation.priceUnit);
+  const annualRevenue = annualProduct * d.exploitation.price;
+  
+  const equipOpex = d.equipment.reduce((s,e)=>s+e.qty*(e.hoursPerYear*e.fuelPerHour*e.fuelPrice + e.price*e.maintPct/100),0);
+  const employeeOpex = d.employees.reduce((s,e)=>s+e.count*e.salary*12*(1+e.benefitsPct/100),0);
+  const miningCost = ore * d.exploitation.miningCost;
+  const wasteCost = ore * d.exploitation.sr * d.exploitation.wasteCost;
+  const processingCost = ore * d.exploitation.processingCost;
+  const gaCost = d.exploitation.gaAnnual;
+  const exploitItemsCost = d.exploitation.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const marketing = ore * d.sales.marketing;
+  const freight = ore * d.sales.freight;
+  const iuranTetap = d.sales.iuranTetap * d.sales.area;
+  
+  const annualOpex = miningCost + wasteCost + processingCost + gaCost + exploitItemsCost + marketing + freight + iuranTetap + equipOpex + employeeOpex;
+  const annualRoyalty = annualRevenue * d.sales.royalty/100;
+  
+  const mineLife = Math.max(1, Math.ceil(d.exploitation.reserve / d.exploitation.production));
+  const prodStart = d.phases.prospeksi.duration + d.phases.eksplorasi.duration + d.phases.fs.duration + d.phases.pengembangan.duration;
+  const prodEnd = prodStart + mineLife - 1;
+  
+  const depreciation = capex / mineLife;
+  const taxArr = [];
+  let lossCarry = 0;
+  for (let i = 0; i < mineLife; i++) {
+    const ebt = annualRevenue - annualOpex - annualRoyalty - depreciation;
+    let taxable = ebt - lossCarry;
+    if (taxable < 0) { lossCarry = -taxable; taxable = 0; }
+    else { lossCarry = 0; }
+    taxArr.push(taxable * d.sales.tax/100);
+  }
+  
+  const totalYears = prodEnd + d.phases.reklamasi.duration + 2;
+  const cf = new Array(totalYears).fill(0);
+  const labels = new Array(totalYears).fill('');
+  
+  let y = 0;
+  for (let i = 0; i < d.phases.prospeksi.duration; i++) { cf[y] -= prospeksiCost/d.phases.prospeksi.duration; labels[y]='Prospeksi'; y++; }
+  for (let i = 0; i < d.phases.eksplorasi.duration; i++) { cf[y] -= eksplorasiCost/d.phases.eksplorasi.duration; labels[y]='Eksplorasi'; y++; }
+  for (let i = 0; i < d.phases.fs.duration; i++) { cf[y] -= fsCost/d.phases.fs.duration; labels[y]='FS'; y++; }
+  for (let i = 0; i < d.phases.pengembangan.duration; i++) { cf[y] -= capex/d.phases.pengembangan.duration; labels[y]='Konstruksi'; y++; }
+  
+  cf[prodStart] -= d.settings.workingCapital;
+  cf[prodEnd] += d.settings.workingCapital;
+  
+  for (let i = 0; i < mineLife; i++) {
+    const cfY = annualRevenue - annualOpex - annualRoyalty - taxArr[i];
+    cf[prodStart+i] += cfY;
+    labels[prodStart+i] = 'Produksi';
+  }
+  
+  const reklamasiCost = d.phases.reklamasi.items.reduce((s,i)=>s+i.qty*i.rate,0);
+  y = prodEnd + 1;
+  for (let i = 0; i < d.phases.reklamasi.duration; i++) { cf[y] -= reklamasiCost/d.phases.reklamasi.duration; labels[y]='Reklamasi'; y++; }
+  
+  // Pasca tambang
+  const disc = d.sales.discount/100;
+  let ptOneTime = 0, ptPerpAnnual = 0;
+  d.phases.pascatambang.items.forEach(item => {
+    const tot = item.qty * item.rate;
+    if (item.perpetual) ptPerpAnnual += tot;
+    else ptOneTime += tot;
+  });
+  const ptPerpPV = disc > 0 ? ptPerpAnnual/disc : 0;
+  cf[y] -= ptOneTime + ptPerpPV;
+  labels[y] = 'Pasca Tambang';
+  
+  return {
+    cf, labels, mineLife, prodStart, prodEnd, totalYears,
+    annualOre: ore, annualProduct, annualRevenue, annualOpex, annualRoyalty,
+    annualMining: miningCost+wasteCost, annualProcessing: processingCost,
+    annualGA: gaCost, annualEquipOpex: equipOpex, annualEmployeeOpex: employeeOpex,
+    annualMarketing: marketing, annualFreight: freight, annualIuran: iuranTetap,
+    annualExploitItems: exploitItemsCost,
+    taxArr, depreciation, capex, capexItems, capexEquip: equipCapex,
+    prospeksiCost, eksplorasiCost, fsCost, reklamasiCost,
+    ptOneTime, ptPerpAnnual, ptPerpPV
+  };
+}
+
+// ============ FINANCIAL INDICATORS ============
+function npv(rate, cf) { return cf.reduce((s,c,t)=>s+c/Math.pow(1+rate,t),0); }
+function irr(cf) {
+  let lo=-0.99, hi=10;
+  const fLo = npv(lo,cf), fHi = npv(hi,cf);
+  if (fLo*fHi > 0) return null;
+  for (let i=0;i<200;i++){
+    const mid=(lo+hi)/2;
+    if (npv(mid,cf)>0) lo=mid; else hi=mid;
+    if (hi-lo<1e-9) break;
+  }
+  return (lo+hi)/2;
+}
+function payback(cf) {
+  let cum=0;
+  for (let t=0;t<cf.length;t++){
+    const prev=cum;
+    cum += cf[t];
+    if (cum>=0 && prev<0) {
+      const frac = -prev / cf[t];
+      return t - 1 + frac;
+    }
+  }
+  return null;
+}
+
+// ============ DASHBOARD ============
+function updateDashboard(m) {
+  const d = DATA;
+  const disc = d.sales.discount/100;
+  const npvVal = npv(disc, m.cf);
+  const irrVal = irr(m.cf);
+  const pb = payback(m.cf);
+  
+  const totalRevenue = m.annualRevenue * m.mineLife;
+  const totalOpex = m.annualOpex * m.mineLife;
+  const totalRoyalty = m.annualRoyalty * m.mineLife;
+  const totalTax = m.taxArr.reduce((a,b)=>a+b,0);
+  const totalCapex = m.capex + d.settings.workingCapital;
+  const totalRecl = m.reklamasiCost;
+  const totalPost = m.ptOneTime + m.ptPerpPV;
+  const totalPreProd = m.prospeksiCost + m.eksplorasiCost + m.fsCost;
+  
+  const avgNet = m.cf.slice(m.prodStart, m.prodEnd+1).reduce((a,b)=>a+b,0) / m.mineLife;
+  const roi = avgNet / totalCapex;
+  
+  $('kpiGrid').innerHTML = `
+    <div class="kpi"><div class="lbl">NPV @ ${d.sales.discount}%</div><div class="val ${npvVal>=0?'pos':'neg'}">${money(npvVal)}</div></div>
+    <div class="kpi"><div class="lbl">IRR</div><div class="val ${irrVal!==null && irrVal*100>=d.sales.discount?'pos':'neg'}">${irrVal!==null?(irrVal*100).toFixed(1)+'%':'N/A'}</div></div>
+    <div class="kpi"><div class="lbl">Payback</div><div class="val ${pb!==null?'pos':'neg'}">${pb!==null?pb.toFixed(1)+' th':'> mine life'}</div></div>
+    <div class="kpi"><div class="lbl">ROI (rata/th)</div><div class="val ${roi>=0?'pos':'neg'}">${(roi*100).toFixed(1)}%</div></div>
+    <div class="kpi"><div class="lbl">Total Investasi</div><div class="val">${money(totalCapex)}</div></div>
+    <div class="kpi"><div class="lbl">Umur Tambang</div><div class="val">${m.mineLife} th</div></div>
+    <div class="kpi"><div class="lbl">Total Pendapatan</div><div class="val">${money(totalRevenue)}</div></div>
+    <div class="kpi"><div class="lbl">Total Biaya (LOM)</div><div class="val">${money(totalOpex+totalRoyalty+totalTax+totalCapex+totalPreProd+totalRecl+totalPost)}</div></div>
+  `;
+  
+  // CF table
+  let cum = 0, tbody = '';
+  for (let t = 0; t < m.cf.length; t++) {
+    cum += m.cf[t];
+    const df = 1/Math.pow(1+disc, t);
+    const pv = m.cf[t]*df;
+    tbody += `<tr><td>${t}</td><td style="text-align:left">${m.labels[t]||'-'}</td>
+      <td>${moneyFull(m.cf[t])}</td>
+      <td style="color:${cum>=0?'var(--green)':'var(--red)'}">${moneyFull(cum)}</td>
+      <td>${df.toFixed(4)}</td><td>${moneyFull(pv)}</td></tr>`;
+  }
+  tbody += `<tr class="total-row"><td colspan="2">NPV</td><td colspan="4">${moneyFull(npvVal)}</td></tr>`;
+  document.querySelector('#cfTable tbody').innerHTML = tbody;
+  
+  // Sensitivity
+  const scenarios = [
+    {name:'Base Case', mod:{}},
+    {name:'Harga −20%', mod:{price:0.8}},
+    {name:'Harga +20%', mod:{price:1.2}},
+    {name:'Grade −20%', mod:{grade:0.8}},
+    {name:'Grade +20%', mod:{grade:1.2}},
+    {name:'CAPEX +20%', mod:{capex:1.2}},
+    {name:'OPEX +20%', mod:{opex:1.2}},
+    {name:'Recovery −10%', mod:{rec:0.9}}
+  ];
+  let sensHTML = '';
+  const savedData = JSON.parse(JSON.stringify(DATA));
+  scenarios.forEach(s => {
+    const d2 = JSON.parse(JSON.stringify(savedData));
+    if (s.mod.price) d2.exploitation.price = savedData.exploitation.price * s.mod.price;
+    if (s.mod.grade) d2.exploitation.grade = savedData.exploitation.grade * s.mod.grade;
+    if (s.mod.capex) d2.settings.contingencyPct = savedData.settings.contingencyPct + 20;
+    if (s.mod.opex) {
+      d2.exploitation.miningCost *= 1.2;
+      d2.exploitation.processingCost *= 1.2;
+      d2.exploitation.wasteCost *= 1.2;
+      d2.exploitation.gaAnnual *= 1.2;
+      d2.sales.marketing *= 1.2;
+      d2.sales.freight *= 1.2;
+    }
+    if (s.mod.rec) d2.exploitation.recovery = savedData.exploitation.recovery * s.mod.rec;
+    const backup = DATA; DATA = d2;
+    const m2 = buildModel();
+    DATA = backup;
+    const n2 = npv(disc, m2.cf);
+    const i2 = irr(m2.cf);
+    const status = n2 >= 0 ? '<span class="badge good">Layak</span>' : '<span class="badge bad">Tidak Layak</span>';
+    sensHTML += `<tr><td style="text-align:left">${s.name}</td><td>${money(n2)}</td><td>${i2!==null?(i2*100).toFixed(1)+'%':'N/A'}</td><td>${status}</td></tr>`;
+  });
+  document.querySelector('#sensTable tbody').innerHTML = sensHTML;
+  
+  // Discount table
+  let discHTML = '';
+  [6,8,10,12,15,20].forEach(r => {
+    discHTML += `<tr><td style="text-align:left">${r}%</td><td>${money(npv(r/100, m.cf))}</td></tr>`;
+  });
+  document.querySelector('#discTable tbody').innerHTML = discHTML;
+  
+  // Cost bars
+  const costs = [
+    {lbl:'Prospeksi', val:m.prospeksiCost},
+    {lbl:'Eksplorasi', val:m.eksplorasiCost},
+    {lbl:'Studi Kelayakan', val:m.fsCost},
+    {lbl:'CAPEX Konstruksi', val:m.capex},
+    {lbl:'Working Capital', val:d.settings.workingCapital},
+    {lbl:'OPEX (LOM)', val:totalOpex},
+    {lbl:'Royalti & PNBP', val:totalRoyalty},
+    {lbl:'PPh Badan', val:totalTax},
+    {lbl:'Reklamasi', val:totalRecl},
+    {lbl:'Pasca Tambang', val:totalPost}
+  ];
+  const maxVal = Math.max(...costs.map(c=>c.val), 1);
+  $('costBars').innerHTML = costs.map(c => `
+    <div class="bar-row"><div class="lbl">${c.lbl}</div>
+    <div class="bar"><div style="width:${(c.val/maxVal*100).toFixed(1)}%"></div></div>
+    <div class="val">${money(c.val)}</div></div>
+  `).join('');
+}
+
+// ============ UPDATE PHASE SUMMARIES ============
+function updatePhaseSummaries(m) {
+  const d = DATA;
+  // Pengembangan
+  $('capex-items').textContent = moneyFull(m.capexItems);
+  $('capex-equip').textContent = moneyFull(m.capexEquip);
+  $('capex-cont').textContent = moneyFull((m.capexItems + m.capexEquip) * d.settings.contingencyPct/100);
+  $('capex-total').textContent = moneyFull(m.capex);
+  
+  // Eksploitasi
+  $('op-life').textContent = m.mineLife + ' tahun';
+  $('op-product').textContent = FMT2.format(m.annualProduct) + ' ' + d.exploitation.priceUnit.replace('$/','');
+  $('op-revenue').textContent = moneyFull(m.annualRevenue);
+  $('op-opex').textContent = moneyFull(m.annualOpex);
+  
+  // Penjualan
+  $('sal-roy').textContent = moneyFull(m.annualRoyalty);
+  $('sal-iur').textContent = moneyFull(m.annualIuran);
+  const avgTax = m.taxArr.reduce((a,b)=>a+b,0)/m.mineLife;
+  $('sal-tax').textContent = moneyFull(avgTax);
+  
+  // Pasca tambang
+  $('pt-onetime').textContent = moneyFull(m.ptOneTime);
+  $('pt-perp-annual').textContent = moneyFull(m.ptPerpAnnual);
+  $('pt-perp-pv').textContent = moneyFull(m.ptPerpPV);
+  $('pt-total').textContent = moneyFull(m.ptOneTime + m.ptPerpPV);
+}
+
+// ============ TIMELINE ============
+function renderTimeline(m) {
+  const d = DATA;
+  const totalYears = m.totalYears;
+  const phases = [
+    {name:'Prospeksi', dur:d.phases.prospeksi.duration, cost:m.prospeksiCost, start:0},
+    {name:'Eksplorasi', dur:d.phases.eksplorasi.duration, cost:m.eksplorasiCost, start:d.phases.prospeksi.duration},
+    {name:'FS', dur:d.phases.fs.duration, cost:m.fsCost, start:d.phases.prospeksi.duration+d.phases.eksplorasi.duration},
+    {name:'Konstruksi', dur:d.phases.pengembangan.duration, cost:m.capex, start:d.phases.prospeksi.duration+d.phases.eksplorasi.duration+d.phases.fs.duration},
+    {name:'Produksi', dur:m.mineLife, cost:m.annualRevenue*m.mineLife, start:m.prodStart},
+    {name:'Reklamasi', dur:d.phases.reklamasi.duration, cost:m.reklamasiCost, start:m.prodEnd+1},
+    {name:'Pasca Tambang', dur:3, cost:m.ptOneTime+m.ptPerpPV, start:m.prodEnd+1+d.phases.reklamasi.duration}
+  ];
+  const maxYear = Math.max(...phases.map(p=>p.start+p.dur));
+  const html = phases.map(p => {
+    const leftPct = (p.start/maxYear*100).toFixed(1);
+    const widthPct = (p.dur/maxYear*100).toFixed(1);
+    const costLabel = p.name === 'Produksi' ? 'Revenue' : 'Cost';
+    return `<div class="timeline-row">
+      <div class="phase">${p.name}</div>
+      <div class="info">${p.dur} th</div>
+      <div class="gantt"><div style="left:${leftPct}%;width:${widthPct}%">${p.dur}th</div></div>
+      <div class="cost">${money(p.cost)}</div>
+    </div>`;
+  }).join('');
+  $('timelineView').innerHTML = html;
+}
+
+// ============ MAIN RECALC ============
+function recalc() {
+  const m = buildModel();
+  updateDashboard(m);
+  updatePhaseSummaries(m);
+  renderTimeline(m);
+  renderForms();
+}
+
+// ============ EXPORT / IMPORT / RESET ============
+function exportData() {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mine-econ-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.phases || !imported.exploitation) throw new Error('Format tidak valid');
+      DATA = imported;
+      saveData();
+      renderAll();
+      alert('✓ Data berhasil diimport');
+    } catch(err) {
+      alert('❌ Gagal import: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+function resetAll() {
+  if (!confirm('Reset semua data ke default? Data saat ini akan hilang.')) return;
+  DATA = defaultData();
+  saveData();
+  renderAll();
+}
+
+// ============ INSTALL PWA ============
+let installPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+  $('installBox').style.display = 'block';
+});
+function installApp() {
+  if (!installPrompt) { alert('Install tidak tersedia. Buka aplikasi melalui HTTPS atau localhost, lalu klik Install di menu browser.'); return; }
+  installPrompt.prompt();
+  installPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') $('installBox').style.display = 'none';
+    installPrompt = null;
+  });
+}
+
+// ============ RENDER ALL ============
+function renderAll() {
+  ['prospeksi','eksplorasi','fs','pengembangan','reklamasi','pascatambang'].forEach(renderPhase);
+  renderEquipment();
+  renderEmployees();
+  renderExploitItems();
+  recalc();
+}
+
+// ============ INIT ============
+renderAll();
+$('lastSaved').textContent = localStorage.getItem(STORAGE_KEY) ? 'Dimuat dari penyimpanan' : 'Baru';
+</script>
+</body>
+</html>
